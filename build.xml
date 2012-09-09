@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<project name="User Registration" default="dist" basedir=".">
+	
+	<property environment="env" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${env.ANT_HOME}/lib/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+	
+	<property name="webapp.dist.dir" location="${basedir}/dist" />
+	<property name="dist.build.src.dir.classes" location="${webapp.dist.dir}/classes" />
+	<property name="dist.build.src.dir.jars" location="${webapp.dist.dir}/jars" />
+	<property name="dist.build.web.dir" location="${webapp.dist.dir}/web" />
+	<property name="dist.wars" location="${webapp.dist.dir}/wars" />
+	<property name="webinf.lib" location="${basedir}/WebContent/WEB-INF/lib" />
+	<property name="src.dir" location="${basedir}/src" />
+	
+	<!--  -->
+	<target name="clean">
+		<echo>Cleaning...</echo>
+		<delete dir="${webapp.dist.dir}" />
+		<echo>Cleaning complete!</echo>
+	</target>
+
+	<!--  -->
+	<target name="init">
+		<echo>Initializing...required directories for the build process would be created now</echo>
+		<mkdir dir="${webapp.dist.dir}" />
+		<mkdir dir="${dist.build.src.dir.classes}" />
+		<mkdir dir="${dist.build.web.dir}" />
+		<mkdir dir="${dist.wars}" />
+		<mkdir dir="${dist.build.src.dir.jars}" />
+		<echo>Initialization complete</echo>
+	</target>
+	
+	<!-- -->
+	<target name="set-classpath">
+		<path id="src.compile.classpath">
+			<fileset dir="${webinf.lib}">
+				<include name="*.jar" />
+			</fileset>						
+		</path>
+		<echo>Execution complete, target: set-classpath</echo>
+	</target>
+	
+	<!-- -->
+	<target name="compile-src" depends="set-classpath">
+		<echo>Executing target: compile-src</echo>
+		
+		<javac destdir="${dist.build.src.dir.classes}" srcdir="${src.dir}">
+			<classpath refid="src.compile.classpath" />
+		</javac>
+		<copy todir="${dist.build.src.dir.classes}" overwrite="true">
+			<fileset dir="${src.dir}" />
+		</copy>		
+		
+		<echo>Execution complete, target: compile-src</echo>
+	</target>
+	
+	<!-- -->
+	<target name="build-src" depends="compile-src">
+		<echo>Executing target: build-src</echo>
+		<jar destfile="${dist.build.src.dir.jars}/userreg.jar}">
+			<fileset dir="${dist.build.src.dir.classes}">
+				<include name="*.*" />
+			</fileset>
+		</jar>
+		<echo>Execution complete, target: build-src</echo>
+	</target>
+	
+	<!-- -->
+	<target name="prepare-war" depends="build-src">
+		<echo>Executing target: prepare-war</echo>
+		<copy todir="${dist.build.web.dir}">
+			<fileset dir="${basedir}/WebContent"/>
+		</copy>
+	
+		<copy todir="${dist.build.web.dir}/WEB-INF/lib">
+			<fileset dir="${dist.build.src.dir.jars}">
+				<include name="${userreg.jar}"/>
+			</fileset>
+		</copy>
+		<echo>Execution complete, target: prepare-war</echo>
+	</target>
+	
+	<!-- -->
+	<target name="package-war" depends="prepare-war">
+		<echo>Executing target: package-war</echo>
+		<jar jarfile="${dist.wars}/UserRegistration.war" >
+			<fileset dir="${dist.build.web.dir}">
+				<include name="**/**"/>
+			</fileset>
+		</jar>
+		<echo>Execution complete, target: package-war</echo>
+	</target>
+	
+	<!-- -->
+	<target name="dist">
+		<echo>Starting webapp build. Executing target: dist</echo>
+		<antcall target="clean" />
+		<antcall target="init" />
+		<antcall target="package-war" />
+		<echo>Webapp build complete</echo>
+	</target>
+
+</project>

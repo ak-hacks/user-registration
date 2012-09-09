@@ -1,7 +1,7 @@
 UserRegistration
 ----------------
 
-This is a simple web application demonstrating a user registration system using Spring, Hibernate and MySQL. This has been tested on:
+This is a simple web application demonstrating a user registration system using Spring, Hibernate and MySQL. The web app also demostrates the use of org.springframework.core.task.TaskExecutor for multithreading. This has been tested on:
 
 * Tomcat 6.0.32
 * Spring 3.0.6
